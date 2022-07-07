@@ -5,6 +5,10 @@ import data from "../mock-data.json";
 import ReadOnlyRow from "../components/readOnlyRow";
 import EditData from "./editData";
 import {nanoid} from 'nanoid';
+import {db} from "../config/firebase"
+import {collection, getDocs,addDoc,updateDoc,deleteDoc} from "firebase/firestore";
+
+
 
 function Input(){
 
@@ -54,12 +58,20 @@ function Input(){
     const formSubmit = (event) =>{
         event.preventDefault();
 
+        const collectionRef = collection(db, "Employee")
+
         const NewFormData = {
             id:nanoid(),
             first: addData.first,
             last: addData.last,
             email: addData.email
         };
+
+        addDoc(collectionRef, NewFormData).then(()=>{
+            alert("Employee Added!!!");
+        }).catch(()=>{
+            alert("Error captured!!")
+        })
 
         const newAddedData = [...contacts,NewFormData];
         setContacts(newAddedData);
@@ -75,6 +87,8 @@ function Input(){
             last: editFormData.last,
             email: editFormData.email
         };
+
+       
         const newData = [...contacts];
         const index = contacts.findIndex((contact)=> contact.id === editContactId); 
 
