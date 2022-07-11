@@ -1,12 +1,13 @@
 
-import React, {useState, Fragment} from "react"
+import React, {useState, Fragment, useEffect} from "react"
 import "../css/inputs.css"
 import data from "../mock-data.json";
 import ReadOnlyRow from "../components/readOnlyRow";
 import EditData from "./editData";
 import {nanoid} from 'nanoid';
-import {db} from "../config/firebase"
-import {collection, getDocs,addDoc,updateDoc,deleteDoc} from "firebase/firestore";
+import EmployeeDataService from "../services/employeeServices";
+import { async } from "@firebase/util";
+
 
 
 
@@ -58,7 +59,6 @@ function Input(){
     const formSubmit = (event) =>{
         event.preventDefault();
 
-        const collectionRef = collection(db, "Employee")
 
         const NewFormData = {
             id:nanoid(),
@@ -66,12 +66,13 @@ function Input(){
             last: addData.last,
             email: addData.email
         };
-
-        addDoc(collectionRef, NewFormData).then(()=>{
+        //This adds employee data on firebase
+        EmployeeDataService.addEmployee(NewFormData).then(()=>{
             alert("Employee Added!!!");
         }).catch(()=>{
-            alert("Error captured!!")
+            alert("Error captured!!");
         })
+
 
         const newAddedData = [...contacts,NewFormData];
         setContacts(newAddedData);
@@ -80,6 +81,7 @@ function Input(){
 
     const handleFormSubmit = (event) =>{
         event.preventDefault();
+      
 
         const edited = {
             id:editContactId,
@@ -87,21 +89,28 @@ function Input(){
             last: editFormData.last,
             email: editFormData.email
         };
-
-       
+        
+        
         const newData = [...contacts];
         const index = contacts.findIndex((contact)=> contact.id === editContactId); 
 
         newData[index] = edited;
-
+       
         setContacts(newData);
+       
+        EmployeeDataService.updateData(index,edited).then(()=>{
+            alert("Employee Added!!!");
+        }).catch(()=>{
+            alert("Error captured!!");
+        })
         setEditContactId(null);
         
         
     };
 
     const handleEditBtn = (event,contact)=>{
-      event.preventDefault();  
+      event.preventDefault();
+        
       setEditContactId(contact.id);
 
       const theValues = {
@@ -109,7 +118,10 @@ function Input(){
         last: contact.last,
         email: contact.email
       }
+     
       setEditFormData(theValues);
+      
+     
     }
 
     const cancel = ()=>{
@@ -117,14 +129,21 @@ function Input(){
     }
 
     const deleteRow = (contactId)=>{
+       
        const newRow = [...contacts] ;
        const index = contacts.findIndex((contact)=>contact.id ===contactId);
-
+       
+       EmployeeDataService.deleteEmp(contactId).then(()=>{
+        alert("Deleted succesfully");
+       }).catch(()=>{
+        alert("Deletion was unsuccessful!!");
+       })
        newRow.splice(index,1);
+       
 
        setContacts(newRow);
+       
     }
-
     return(
         <div className="style">
             <div className="styleEmp">

@@ -1,6 +1,8 @@
 import React from 'react'
+import EmployeeDataService from "../services/employeeServices";
 
 const ReadOnlyRow = ({contact,handleEditBtn,deleteRow}) =>{
+    
     return(
         
             <tr>
@@ -9,7 +11,7 @@ const ReadOnlyRow = ({contact,handleEditBtn,deleteRow}) =>{
                 <td>{contact.email}</td>
                 <td>
                     <button type="button" onClick={(event)=>handleEditBtn(event,contact)}>Edit</button>
-                    <button type="button" onClick={()=> deleteRow(contact.id)}>Delete</button>
+                    <button type="button" onClick={()=> deleteRow(contact.id,EmployeeDataService.deleteEmp(contact.id))}>Delete</button>
                 </td>
             </tr>
         
